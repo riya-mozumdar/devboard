@@ -1,0 +1,228 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DevBoard - Task Tracker</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f4f6f9;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: auto;
+        }
+
+        h1 {
+            color: #222;
+        }
+
+        .dashboard {
+            display: flex;
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        .card {
+            background: white;
+            padding: 20px;
+            flex: 1;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .task-form {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+        }
+
+        input, select, button {
+            padding: 10px;
+            margin: 5px;
+        }
+
+        button {
+            background: #2563eb;
+            color: white;
+            border: none;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+
+        .task {
+            background: white;
+            padding: 15px;
+            margin-top: 10px;
+            border-radius: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .task button {
+            background: #dc2626;
+        }
+
+        .task small {
+            color: #666;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <h1>🚀 DevBoard</h1>
+    <p>Developer Task Management Dashboard</p>
+
+    <div class="dashboard">
+        <div class="card">
+            <h2 id="total">0</h2>
+            <p>Total Tasks</p>
+        </div>
+
+        <div class="card">
+            <h2 id="progress">0</h2>
+            <p>In Progress</p>
+        </div>
+
+        <div class="card">
+            <h2 id="completed">0</h2>
+            <p>Completed</p>
+        </div>
+    </div>
+
+    <div class="task-form">
+        <h3>Add New Task</h3>
+
+        <input type="text" id="taskName"
+               placeholder="Enter task name">
+
+        <select id="priority">
+            <option value="High">High Priority</option>
+            <option value="Medium">Medium Priority</option>
+            <option value="Low">Low Priority</option>
+        </select>
+
+        <button onclick="addTask()">Add Task</button>
+    </div>
+
+    <h2>My Tasks</h2>
+
+    <div id="taskList"></div>
+
+</div>
+
+<script>
+
+    let tasks = [];
+
+    function addTask() {
+
+        let name = document.getElementById("taskName").value;
+        let priority = document.getElementById("priority").value;
+
+        if (name.trim() === "") {
+            alert("Please enter a task name");
+            return;
+        }
+
+        tasks.push({
+            name: name,
+            priority: priority,
+            status: "To Do"
+        });
+
+        document.getElementById("taskName").value = "";
+
+        displayTasks();
+    }
+
+    function displayTasks() {
+
+        let list = document.getElementById("taskList");
+        list.innerHTML = "";
+
+        tasks.forEach((task, index) => {
+
+            list.innerHTML += `
+                <div class="task">
+
+                    <div>
+                        <strong>${escapeHTML(task.name)}</strong>
+                        <br>
+                        <small>
+                            Priority: ${task.priority}
+                        </small>
+                    </div>
+
+                    <select onchange="updateStatus(${index}, this.value)">
+                        <option ${task.status === "To Do" ? "selected" : ""}>
+                            To Do
+                        </option>
+                        <option ${task.status === "In Progress" ? "selected" : ""}>
+                            In Progress
+                        </option>
+                        <option ${task.status === "Completed" ? "selected" : ""}>
+                            Completed
+                        </option>
+                    </select>
+
+                    <button onclick="deleteTask(${index})">
+                        Delete
+                    </button>
+
+                </div>
+            `;
+
+        });
+
+        updateDashboard();
+    }
+
+    function escapeHTML(value) {
+        return value.replace(/[&<>"']/g, char => ({
+            "&": "&amp;",
+            "<": "&lt;",
+            ">": "&gt;",
+            '"': "&quot;",
+            "'": "&#39;"
+        })[char]);
+    }
+
+    function updateStatus(index, status) {
+        tasks[index].status = status;
+        displayTasks();
+    }
+
+    function deleteTask(index) {
+        tasks.splice(index, 1);
+        displayTasks();
+    }
+
+    function updateDashboard() {
+
+        document.getElementById("total").innerText =
+            tasks.length;
+
+        document.getElementById("progress").innerText =
+            tasks.filter(t => t.status === "In Progress").length;
+
+        document.getElementById("completed").innerText =
+            tasks.filter(t => t.status === "Completed").length;
+    }
+
+</script>
+
+</body>
+</html>
+
